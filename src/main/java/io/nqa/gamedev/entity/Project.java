@@ -1,8 +1,6 @@
 package io.nqa.gamedev.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,4 +23,7 @@ public class Project {
 
     @OneToMany
     private List<Script> scripts;
+
+    @OneToMany
+    private List<Cue> cues;
 }

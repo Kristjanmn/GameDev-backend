@@ -26,6 +26,8 @@ public class DialogLine {
     // speaker
 
     // cue
+    @ManyToOne
+    private Cue cue;
 
     // waitTime
     private float waitTime;
