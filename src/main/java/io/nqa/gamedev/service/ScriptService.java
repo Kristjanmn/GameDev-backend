@@ -94,16 +94,32 @@ public class ScriptService implements IScriptService {
         return new Script(guid, isGlobal, scriptName, variables);
     }
 
+    /**
+     * Construct ScriptVariable from given variables.
+     * Returns already created ScriptVariables, if one exists.
+     *
+     * @param varType Variable type, like FName
+     * @param varName Variable name, like ItemID
+     * @return ScriptVariable containing these values
+     */
     @Override
     public ScriptVariable newScriptVar(String varType, String varName) {
+        // Check if such variable already exists.
+        Optional<ScriptVariable> optVar = findScriptVarByTypeName(varType, varName);
+        if (optVar.isPresent()) return optVar.get();
+        // Create new variable if it does not already exist.
         String guid = GUIDGenerator.generate();
         while (this.scriptVariableRepository.findById(guid).isPresent()) guid = GUIDGenerator.generate();
         return new ScriptVariable(guid, varType, varName);
     }
 
     @Override
+    public Optional<ScriptVariable> findScriptVarByTypeName(String varType, String varName) {
+        return this.scriptVariableRepository.findByVariableTypeEqualsAndVariableNameEquals(varType, varName);
+    }
+
+    @Override
     public boolean scriptVariableExists(String varType, String varName) {
-        Optional<ScriptVariable> optVar = this.scriptVariableRepository.findByVariableTypeEqualsAndVariableNameEquals(varType, varName);
-        return optVar.isPresent();
+        return this.findScriptVarByTypeName(varType, varName).isPresent();
     }
 }

@@ -5,6 +5,7 @@ import io.nqa.gamedev.entity.ScriptVariable;
 import io.nqa.gamedev.model.CustomResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IScriptService {
 
@@ -25,6 +26,8 @@ public interface IScriptService {
     Script newScript(String scriptName, boolean isGlobal, ScriptVariable ... vars);
 
     ScriptVariable newScriptVar(String varType, String varName);
+
+    Optional<ScriptVariable> findScriptVarByTypeName(String varType, String varName);
 
     boolean scriptVariableExists(String varType, String varName);
 }
