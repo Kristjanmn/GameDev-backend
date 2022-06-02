@@ -22,6 +22,8 @@ public class DialogLine {
     private String nextLine;
 
     // choices
+    @ManyToMany
+    private List<DialogLine> choices;       // will most likely turn into infinite loop very shortly
 
     // speaker
 
