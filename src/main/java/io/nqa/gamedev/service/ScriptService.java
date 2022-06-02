@@ -2,12 +2,19 @@ package io.nqa.gamedev.service;
 
 import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.repository.ScriptRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScriptService implements IScriptService {
+
+    @Autowired
+    private ScriptRepository scriptRepository;
 
     /**
      * Create global scripts for basic functionality.
@@ -18,9 +25,15 @@ public class ScriptService implements IScriptService {
         //
     }
 
+    /**
+     * Get global scripts.
+     *
+     * @return List of global scripts
+     */
     @Override
     public List<Script> getGlobalScripts() {
-        return null;
+        Optional<List<Script>> optScripts = this.scriptRepository.findAllByGlobalIsTrue();
+        return optScripts.orElseGet(ArrayList::new);
     }
 
     @Override
@@ -30,7 +43,8 @@ public class ScriptService implements IScriptService {
 
     @Override
     public CustomResponse getScripts(String projectId) {
-        return null;
+        this.getGlobalScripts();
+        return new CustomResponse(false, "FUNCTION NOT COMPLETE", this.getGlobalScripts());
     }
 
     @Override
