@@ -13,6 +13,8 @@ public class Script {
     @Id
     private String id;
 
+    private boolean global;
+
     private String name;
 
     @ManyToMany

@@ -1,7 +1,6 @@
 package io.nqa.gamedev.service;
 
 import io.nqa.gamedev.entity.Script;
-import io.nqa.gamedev.entity.global.GlobalScript;
 import io.nqa.gamedev.model.CustomResponse;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
-    public List<GlobalScript> getGlobalScripts() {
+    public List<Script> getGlobalScripts() {
         return null;
     }
 
