@@ -15,7 +15,7 @@ public class ScriptVariable {
     @Id
     private String id;
 
-    private int order;
+    private int listOrder;
 
     @ManyToOne
     private VariableType variableType;
