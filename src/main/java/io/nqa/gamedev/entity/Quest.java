@@ -18,6 +18,10 @@ public class Quest {
 
     private String questId;
 
+    private String title;
+
+    private String comment;
+
     @OneToMany
     private List<QuestPhase> phases;
 }

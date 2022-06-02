@@ -4,7 +4,9 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Data
 @Entity
@@ -15,4 +17,9 @@ public class QuestPhase {
     private String id;
 
     private String phaseId;
+
+    private String description;
+
+    @ManyToMany
+    private List<Script> script;
 }

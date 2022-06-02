@@ -2,9 +2,8 @@ package io.nqa.gamedev.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -15,4 +14,26 @@ public class DialogLine {
     private String id;
 
     private String lineId;
+
+    private int listOrder;
+
+    // dialog type
+
+    private String nextLine;
+
+    // choices
+
+    // speaker
+
+    // cue
+
+    // waitTime
+    private float waitTime;
+
+    private String lineText;
+
+    @ManyToMany
+    private List<Script> script;
+
+    private boolean locked;
 }
