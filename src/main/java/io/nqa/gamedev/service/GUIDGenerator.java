@@ -1,5 +1,8 @@
 package io.nqa.gamedev.service;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class GUIDGenerator {
     private static volatile GUIDGenerator guidGenerator;
     private static final int DEFAULT_LENGTH = 16;
