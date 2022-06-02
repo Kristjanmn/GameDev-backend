@@ -1,1 +1,18 @@
-
+spring:
+  datasource:
+    url: jdbc:mysql://nqa.io:3306/gamedevelopment
+    username: gamedevelopment
+    password: Gam3D3v3!0pm3nt
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8092
+  address: 0.0.0.0
+#  ssl:
+#    key-store: /etc/letsencrypt/live/nqa.io/keystore.p12
+#    key-store-password: poophole
+#    key-store-type: PKCS12
+#    key-alias: tomcat
