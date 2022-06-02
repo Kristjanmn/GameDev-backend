@@ -1,6 +1,7 @@
 package io.nqa.gamedev.service;
 
 import io.nqa.gamedev.entity.Script;
+import io.nqa.gamedev.entity.ScriptVariable;
 import io.nqa.gamedev.model.CustomResponse;
 
 import java.util.List;
@@ -17,5 +18,13 @@ public interface IScriptService {
 
     CustomResponse getScript(String scriptId);      // Script
 
+    void saveGlobalScript(Script script);
+
     CustomResponse saveScript(String projectId, Script script);
+
+    Script newScript(String scriptName, boolean isGlobal, ScriptVariable ... vars);
+
+    ScriptVariable newScriptVar(String varType, String varName);
+
+    boolean scriptVariableExists(String varType, String varName);
 }
