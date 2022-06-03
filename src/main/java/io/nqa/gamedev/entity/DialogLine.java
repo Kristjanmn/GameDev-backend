@@ -23,7 +23,9 @@ public class DialogLine {
 
     // choices
     @ManyToMany
-    private List<DialogLine> choices;       // will most likely turn into infinite loop very shortly
+    private List<DialogLine> choices;       // will most likely turn into infinite loop very shortly.
+                                            // It does not like List<String>, and I can't
+                                            // think of anything else at this time.
 
     // speaker
 
@@ -40,4 +42,6 @@ public class DialogLine {
     private List<Script> script;
 
     private boolean locked;
+
+    private String comment;
 }

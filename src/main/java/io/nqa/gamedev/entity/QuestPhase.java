@@ -22,4 +22,6 @@ public class QuestPhase {
 
     @ManyToMany
     private List<Script> script;
+
+    private String comment;
 }

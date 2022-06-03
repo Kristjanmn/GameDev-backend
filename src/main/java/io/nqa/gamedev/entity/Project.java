@@ -19,6 +19,8 @@ public class Project {
 
     private String title;
 
+    private String description;
+
     @OneToMany
     private List<Quest> quests;
 
