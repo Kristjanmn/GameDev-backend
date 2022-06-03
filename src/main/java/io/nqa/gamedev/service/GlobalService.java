@@ -22,6 +22,10 @@ public class GlobalService {
         return false;
     }
 
+    public static boolean notNull(Object ... objects) {
+        return !isNull(objects);
+    }
+
     public static boolean isBlank(String ... args) {
         init();
         for (String arg : args) {
