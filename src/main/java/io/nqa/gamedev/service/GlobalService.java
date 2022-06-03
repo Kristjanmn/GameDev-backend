@@ -14,6 +14,18 @@ public class GlobalService {
         if (globalService == null) globalService = new GlobalService();
     }
 
+    /**
+     * Check if all the booleans are true.
+     *
+     * @param bools List of booleans
+     * @return Are all booleans true?
+     */
+    public static boolean isTrue(boolean ... booleans) {
+        init();
+        for (boolean bool : booleans) if (isNull(bool) || !bool) return false;
+        return true;
+    }
+
     public static boolean isNull(Object ... objects) {
         init();
         for (Object obj : objects) {
