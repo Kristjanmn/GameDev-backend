@@ -189,8 +189,15 @@ public class ScriptService implements IScriptService {
      */
     @Override
     public boolean scriptExists(String scriptName, boolean isGlobal, List<ScriptVariable> variables) {
-        Optional<Script> optScript = this.scriptRepository.findByNameEqualsAndGlobalEquals(scriptName, isGlobal);
-        return (optScript.isPresent() && optScript.get().getVariables().equals(variables));
+        // Getting every function with same name and global variables, as repository does not like to compare arrays.
+        List<Script> scripts = this.scriptRepository.findAllByNameEqualsAndGlobalEquals(scriptName, isGlobal);
+        for (Script script : scripts) {
+            // Very odd case below..
+            //            // variables.equals(script.getVariables())  returns true
+            //            // script.getVariables().equals(variables)  returns false
+            if (variables.equals(script.getVariables())) return true;
+        }
+        return false;
     }
 
     @Override
