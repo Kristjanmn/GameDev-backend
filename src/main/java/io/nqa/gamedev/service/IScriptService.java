@@ -15,6 +15,8 @@ public interface IScriptService {
 
     List<Script> getProjectScripts(String projectId);
 
+    CustomResponse getScripts();
+
     CustomResponse getScripts(String projectId);    // List<Script>
 
     CustomResponse getScript(String scriptId);      // Script

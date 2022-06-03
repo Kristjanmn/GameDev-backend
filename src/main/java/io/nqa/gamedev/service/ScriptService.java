@@ -105,7 +105,13 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
+    public CustomResponse getScripts() {
+        return new CustomResponse(true, "success", this.getGlobalScripts());
+    }
+
+    @Override
     public CustomResponse getScripts(String projectId) {
+        if (GlobalService.isBlank(projectId)) return this.getScripts();
         List<Script> allScripts = this.getGlobalScripts();
         List<Script> projectScripts = this.getProjectScripts(projectId);
         if (GlobalService.notNull(projectScripts)) allScripts.addAll(projectScripts);
@@ -114,7 +120,12 @@ public class ScriptService implements IScriptService {
 
     @Override
     public CustomResponse getScript(String scriptId) {
-        return null;
+        if (GlobalService.isBlank(scriptId))
+            return new CustomResponse(false, "scriptId was not included in request", null);
+        Optional<Script> optScript = this.scriptRepository.findById(scriptId);
+        if (optScript.isEmpty())
+            return new CustomResponse(false, "Could not find script: " + scriptId, null);
+        return new CustomResponse(true, "success", optScript.get());
     }
 
     @Override
