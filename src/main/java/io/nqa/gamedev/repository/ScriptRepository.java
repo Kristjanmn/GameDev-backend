@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface ScriptRepository extends JpaRepository<Script, String> {
     Optional<List<Script>> findAllByGlobalIsTrue();
 
-    Optional<Script> findByNameEqualsAndGlobalEquals(String scriptName, boolean isGlobal);
+    List<Script> findAllByNameEqualsAndGlobalEquals(String scriptName, boolean isGlobal);
 }
