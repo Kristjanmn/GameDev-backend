@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class GlobalService implements IGlobalService {
+public class GlobalService {
     private static volatile GlobalService globalService;
 
     private GlobalService() {}
@@ -14,21 +14,24 @@ public class GlobalService implements IGlobalService {
         if (globalService == null) globalService = new GlobalService();
     }
 
-    public boolean isNull(Object ... objects) {
+    public static boolean isNull(Object ... objects) {
+        init();
         for (Object obj : objects) {
             if (obj == null) return true;
         }
         return false;
     }
 
-    public boolean isBlank(String ... args) {
+    public static boolean isBlank(String ... args) {
+        init();
         for (String arg : args) {
             if (arg == null || arg.trim().isBlank()) return true;
         }
         return false;
     }
 
-    public boolean isEmpty(List ... lists) {
+    public static boolean isEmpty(List ... lists) {
+        init();
         for (List list : lists) {
             if (list == null || list.isEmpty()) return true;
         }
