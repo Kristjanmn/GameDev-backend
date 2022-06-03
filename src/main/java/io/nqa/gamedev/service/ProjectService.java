@@ -37,8 +37,11 @@ public class ProjectService implements IProjectService {
      */
     @Override
     public CustomResponse getProjectById(String projectId) {
+        if (GlobalService.isBlank(projectId))
+            return new CustomResponse(false, "projectId was not included in request", null);
         Project project = this.getById(projectId);
-        if (GlobalService.isNull(project)) return new CustomResponse(false, "Could not get project " + projectId, null);
+        if (GlobalService.isNull(project))
+            return new CustomResponse(false, "Could not get project " + projectId, null);
         return new CustomResponse(true, "success", project);
     }
 
