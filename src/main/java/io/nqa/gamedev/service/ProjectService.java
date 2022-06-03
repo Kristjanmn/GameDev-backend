@@ -2,7 +2,9 @@ package io.nqa.gamedev.service;
 
 import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.entity.Script;
+import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.repository.ProjectRepository;
+import io.nqa.gamedev.service.global.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,19 @@ public class ProjectService implements IProjectService {
     public Project getById(String projectId) {
         Optional<Project> optProject = this.projectRepository.findById(projectId);
         return optProject.orElse(null);
+    }
+
+    /**
+     * Used only for communicating with frontend.
+     *
+     * @param projectId Desired project's ID
+     * @return CustomResponse with Project as Object
+     */
+    @Override
+    public CustomResponse getProjectById(String projectId) {
+        Project project = this.getById(projectId);
+        if (GlobalService.isNull(project)) return new CustomResponse(false, "Could not get project " + projectId, null);
+        return new CustomResponse(true, "success", project);
     }
 
     @Override
