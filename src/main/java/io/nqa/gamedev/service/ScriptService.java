@@ -1,5 +1,6 @@
 package io.nqa.gamedev.service;
 
+import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.entity.ScriptVariable;
 import io.nqa.gamedev.model.CustomResponse;
@@ -55,15 +56,26 @@ public class ScriptService implements IScriptService {
         return optScripts.orElseGet(ArrayList::new);
     }
 
+    /**
+     * Tries to fetch project's scripts.
+     * Returns NULL if project was not found.
+     *
+     * @param projectId Desired project id
+     * @return List of Scripts assigned to project
+     */
     @Override
     public List<Script> getProjectScripts(String projectId) {
-        return null;
+        Project project = this.projectService.getById(projectId);
+        if (GlobalService.isNull(project)) return null;
+        return project.getScripts();
     }
 
     @Override
     public CustomResponse getScripts(String projectId) {
-        this.getGlobalScripts();
-        return new CustomResponse(false, "FUNCTION NOT COMPLETE", this.getGlobalScripts());
+        List<Script> allScripts = this.getGlobalScripts();
+        List<Script> projectScripts = this.getProjectScripts(projectId);
+        if (GlobalService.notNull(projectScripts)) allScripts.addAll(projectScripts);
+        return new CustomResponse(true, "Found " + allScripts.size() + " scripts", allScripts);
     }
 
     @Override
