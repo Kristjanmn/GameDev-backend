@@ -1,4 +1,4 @@
-package io.nqa.gamedev.service;
+package io.nqa.gamedev.service.global;
 
 import org.springframework.stereotype.Service;
 

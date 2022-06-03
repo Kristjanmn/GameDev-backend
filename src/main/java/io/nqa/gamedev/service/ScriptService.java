@@ -6,6 +6,8 @@ import io.nqa.gamedev.entity.ScriptVariable;
 import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.repository.ScriptRepository;
 import io.nqa.gamedev.repository.ScriptVariableRepository;
+import io.nqa.gamedev.service.global.GUIDGenerator;
+import io.nqa.gamedev.service.global.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
