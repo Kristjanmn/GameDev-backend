@@ -15,6 +15,18 @@ public class ProjectService implements IProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    /**
+     * Pass Optional<Project> to another service.
+     *
+     * @param projectId Id of the desired Project to find
+     * @return Optional<Project>
+     */
+    @Override
+    public Project getById(String projectId) {
+        Optional<Project> optProject = this.projectRepository.findById(projectId);
+        return optProject.orElse(null);
+    }
+
     @Override
     public boolean hasScript(String projectId, Script script) {
         return this.projectRepository.findByIdAndScriptsContains(projectId, script).isPresent();
