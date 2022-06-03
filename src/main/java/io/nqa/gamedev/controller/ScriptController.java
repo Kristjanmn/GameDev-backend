@@ -4,6 +4,7 @@ import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.service.IScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,5 +19,10 @@ public class ScriptController {
     public CustomResponse test() {
         this.scriptService.setupGlobalScripts();
         return new CustomResponse(true, "connection works", null);
+    }
+
+    @GetMapping(value = "getProjectScripts/{projectId}")
+    public CustomResponse getProjectScriptsByProjectId(@PathVariable String projectId) {
+        return this.scriptService.getScripts(projectId);
     }
 }
