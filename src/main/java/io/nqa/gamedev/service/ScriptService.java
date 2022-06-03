@@ -31,18 +31,50 @@ public class ScriptService implements IScriptService {
      */
     @Override
     public void setupGlobalScripts() {
-        List<ScriptVariable> variables = new ArrayList<>();
-        variables.add(this.newScriptVar("FName", "CharacterID"));
-        variables.add(this.newScriptVar("FName", "LineID"));
-        for (ScriptVariable scriptVariable : variables) {
-            this.scriptVariableRepository.save(scriptVariable);
-        }
+        this.saveGlobalScript(this.newScript("PassTime", true,
+                this.newScriptVar("EPassTime","Method"),
+                this.newScriptVar("int", "Hours"),
+                this.newScriptVar("int", "Minutes")));
 
-        List<Script> scripts = new ArrayList<>();
-        scripts.add(new Script(GUIDGenerator.generate(), true, "SetNextLine", variables));
-        for (Script script : scripts) {
-            this.saveGlobalScript(script);
-        }
+        this.saveGlobalScript(this.newScript("GiveItem", true,
+                this.newScriptVar("FName","From"),
+                this.newScriptVar("FName", "To"),
+                this.newScriptVar("FName", "ItemID")));
+
+        this.saveGlobalScript(this.newScript("GiveMoney", true,
+                this.newScriptVar("FName","From"),
+                this.newScriptVar("FName", "To"),
+                this.newScriptVar("int", "Amount")));
+
+        this.saveGlobalScript(this.newScript("ChangeName", true,
+                this.newScriptVar("ACharacter*","Character"),
+                this.newScriptVar("FString", "NewName")));
+
+        this.saveGlobalScript(this.newScript("UpdateQuestDescription", true,
+                this.newScriptVar("FName","QuestID"),
+                this.newScriptVar("FText", "Description")));
+
+        this.saveGlobalScript(this.newScript("SetQuestState", true,
+                this.newScriptVar("FName","QuestID"),
+                this.newScriptVar("EQuestState", "State")));
+
+        this.saveGlobalScript(this.newScript("SetQuestPhase", true,
+                this.newScriptVar("FName","QuestID"),
+                this.newScriptVar("FName", "Phase")));
+
+        this.saveGlobalScript(this.newScript("SetDialogLocked", true,
+                this.newScriptVar("FName","CharacterID"),
+                this.newScriptVar("FName", "LineID"),
+                this.newScriptVar("boolean", "Locked")));
+
+        this.saveGlobalScript(this.newScript("SetDialogsLocked", true,
+                this.newScriptVar("FName","CharacterID"),
+                this.newScriptVar("TArray<FName>", "LineIDs"),
+                this.newScriptVar("boolean", "Locked")));
+
+        this.saveGlobalScript(this.newScript("SetNextLine", true,
+                this.newScriptVar("FName", "CharacterID"),
+                this.newScriptVar("FName", "LineID")));
     }
 
     /**
@@ -85,7 +117,13 @@ public class ScriptService implements IScriptService {
 
     @Override
     public void saveGlobalScript(Script script) {
-        this.scriptRepository.save(script);
+        if (this.scriptExists(script.getName(), script.isGlobal(), script.getVariables())) return;
+        if (GlobalService.notNull(script)) {
+            for (ScriptVariable var : script.getVariables()) {
+                this.saveScriptVar(var);
+            }
+            this.scriptRepository.save(script);
+        }
     }
 
     @Override
@@ -125,9 +163,34 @@ public class ScriptService implements IScriptService {
         return new ScriptVariable(guid, varType, varName);
     }
 
+    /**
+     * Save new script variable, if it does not exist already.
+     *
+     * @param var script variable
+     */
+    @Override
+    public void saveScriptVar(ScriptVariable var) {
+        if (!this.scriptVariableExists(var.getVariableType(), var.getVariableName()))
+            this.scriptVariableRepository.save(var);
+    }
+
     @Override
     public Optional<ScriptVariable> findScriptVarByTypeName(String varType, String varName) {
         return this.scriptVariableRepository.findByVariableTypeEqualsAndVariableNameEquals(varType, varName);
+    }
+
+    /**
+     * Check if script with same name and all same variables exists.
+     *
+     * @param scriptName Script name
+     * @param isGlobal Is script global
+     * @param variables List of ScriptVariable
+     * @return Does script exist?
+     */
+    @Override
+    public boolean scriptExists(String scriptName, boolean isGlobal, List<ScriptVariable> variables) {
+        Optional<Script> optScript = this.scriptRepository.findByNameEqualsAndGlobalEquals(scriptName, isGlobal);
+        return (optScript.isPresent() && optScript.get().getVariables().equals(variables));
     }
 
     @Override

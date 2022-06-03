@@ -27,7 +27,11 @@ public interface IScriptService {
 
     ScriptVariable newScriptVar(String varType, String varName);
 
+    void saveScriptVar(ScriptVariable variable);
+
     Optional<ScriptVariable> findScriptVarByTypeName(String varType, String varName);
+
+    boolean scriptExists(String scriptName, boolean isGlobal, List<ScriptVariable> variables);
 
     boolean scriptVariableExists(String varType, String varName);
 }
