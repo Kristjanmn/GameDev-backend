@@ -13,6 +13,10 @@ public class Project {
     @Id
     private String id;
 
+    // This is different from 'id' above, it can be changed from
+    // project settings and can be used to access project from web.
+    private String projectId;
+
     private String title;
 
     @OneToMany
