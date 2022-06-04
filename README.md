@@ -88,6 +88,8 @@ Project {
 }
 ```
 
+### Dialog classes
+
 #### Dialog
 <p>Dialog class</p>
 
@@ -121,6 +123,8 @@ DialogLine {
 }
 ```
 
+### Quest classes
+
 #### Quest
 <p>Quest class</p>
 
@@ -145,6 +149,34 @@ QuestPhase {
     String phaseId              Defined by user, used to reference to phase
     String description          Description provided to player in game
     String comment              Developer's comment
+}
+```
+
+### Script classes
+
+#### Script
+<p>Script class. Similar to what's in C++ system.</p>
+
+```
+Database table "script"
+Script {
+    String id                   Database ID as GUID
+    boolean global              Defines if script is globally available,
+                                which is used for core functionality of this system.
+    String name                 Name of the script function in C++
+    List<ScriptVariable>        List of variables required by this script
+}
+```
+
+#### ScriptVariable
+<P>ScriptVariable class</P>
+
+```
+Database table "variable"
+ScriptVariable {
+    String id                   Database ID as GUID
+    String variableType         Variable type used in engine
+    String variableName         Variable name used in engine
 }
 ```
 
