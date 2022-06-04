@@ -180,4 +180,16 @@ ScriptVariable {
 }
 ```
 
+#### Cue
+<p>Cue class. Used for audio files</p>
+
+```
+Database table "cue"
+Cue {
+    String id                   Database ID as GUID
+    String cueId                Provided by user
+    String comment              Developer's comment
+}
+```
+
 <br><br><p><i>This system is developed by Kristjan Männimets.</i></p>

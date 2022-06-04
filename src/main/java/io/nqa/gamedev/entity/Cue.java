@@ -15,4 +15,6 @@ public class Cue {
     private String id;
 
     private String cueId;
+
+    private String comment;
 }
