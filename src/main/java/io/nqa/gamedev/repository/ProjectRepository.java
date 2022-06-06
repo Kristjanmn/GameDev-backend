@@ -10,5 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
 
+    Optional<Project> findByProjectIdEquals(String projectId);
+
     Optional<Project> findByIdAndScriptsContains(String projectId, Script script);
 }
