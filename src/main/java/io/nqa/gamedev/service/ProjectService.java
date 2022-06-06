@@ -56,7 +56,7 @@ public class ProjectService implements IProjectService {
         Project project = this.getById(databaseId);
         if (GlobalService.isNull(project))
             return new CustomResponse(false, "Could not get project " + databaseId, null);
-        return new CustomResponse(project);
+        return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
     }
 
     /**
