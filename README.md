@@ -14,9 +14,10 @@
 <p>This section explains API calls. For mentioned classes please scroll down.</p>
 
 **Project**<br>
-***Returns CustomResponse with Project as Object***
+***Returns CustomResponse with ProjectDTO as Object***
 ```
-/api/project/getProjectById/{projectId}
+/api/project/getById/{databaseId}
+/api/project/getByProjectId/{projectId}
 ```
 
 # Structure
