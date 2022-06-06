@@ -3,8 +3,10 @@ package io.nqa.gamedev.service;
 import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.model.ProjectDTO;
 import io.nqa.gamedev.repository.ProjectRepository;
 import io.nqa.gamedev.service.global.GlobalService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,31 +20,59 @@ public class ProjectService implements IProjectService {
     private ProjectRepository projectRepository;
 
     /**
-     * Pass Optional<Project> to another service.
+     * Try to get project by database Id
      *
-     * @param projectId Id of the desired Project to find
-     * @return Optional<Project>
+     * @param databaseId Database Id of the desired Project to find
+     * @return Project if one was found
      */
     @Override
-    public Project getById(String projectId) {
-        Optional<Project> optProject = this.projectRepository.findById(projectId);
+    public Project getById(String databaseId) {
+        Optional<Project> optProject = this.projectRepository.findById(databaseId);
+        return optProject.orElse(null);
+    }
+
+    /**
+     * Try to get project by projectId
+     *
+     * @param projectId Id which can be defined by user
+     * @return Project if one was found
+     */
+    @Override
+    public Project getByProjectId(String projectId) {
+        Optional<Project> optProject = this.projectRepository.findByProjectIdEquals(projectId);
         return optProject.orElse(null);
     }
 
     /**
      * Used only for communicating with frontend.
      *
-     * @param projectId Desired project's ID
+     * @param databaseId Desired project's database ID
      * @return CustomResponse with Project as Object
      */
     @Override
-    public CustomResponse getProjectById(String projectId) {
+    public CustomResponse getProjectById(String databaseId) {
+        if (GlobalService.isBlank(databaseId))
+            return new CustomResponse(false, "project databaseId was not included in request", null);
+        Project project = this.getById(databaseId);
+        if (GlobalService.isNull(project))
+            return new CustomResponse(false, "Could not get project " + databaseId, null);
+        return new CustomResponse(project);
+    }
+
+    /**
+     * Get Project by projectId for frontend
+     *
+     * @param projectId Desired project's projectId
+     * @return CustomResponse with Project as Object
+     */
+    @Override
+    public CustomResponse getProjectByProjectId(String projectId) {
         if (GlobalService.isBlank(projectId))
             return new CustomResponse(false, "projectId was not included in request", null);
-        Project project = this.getById(projectId);
+        Project project = this.getByProjectId(projectId);
         if (GlobalService.isNull(project))
             return new CustomResponse(false, "Could not get project " + projectId, null);
-        return new CustomResponse(true, "success", project);
+        return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
     }
 
     @Override

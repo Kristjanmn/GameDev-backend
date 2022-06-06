@@ -5,9 +5,13 @@ import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
 
 public interface IProjectService {
-    Project getById(String projectId);
+    Project getById(String databaseId);
 
-    CustomResponse getProjectById(String projectId);
+    Project getByProjectId(String projectId);
+
+    CustomResponse getProjectById(String databaseId);
+
+    CustomResponse getProjectByProjectId(String projectId);
 
     boolean hasScript(String projectId, Script script);
 
