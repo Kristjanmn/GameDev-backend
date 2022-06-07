@@ -15,9 +15,9 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    @GetMapping(value = "getById/{projectId}")
-    public CustomResponse getProjectById(@PathVariable String projectId) {
-        return this.projectService.getProjectById(projectId);
+    @GetMapping(value = "getById/{databaseId}")
+    public CustomResponse getProjectById(@PathVariable String databaseId) {
+        return this.projectService.getProjectById(databaseId);
     }
 
     @GetMapping(value = "getByProjectId/{projectId}")
