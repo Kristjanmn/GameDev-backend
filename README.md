@@ -1,5 +1,7 @@
 # Dialog & Quest
 
+## This is NOT a game! This is backend for companion app, which is meant to help with game development!<br>
+
 <h3>Backend for game development project "Dialog & Quest"</h3>
 
 <h3>Dialog & Quest is a custom system for Unreal Engine to implement basic
