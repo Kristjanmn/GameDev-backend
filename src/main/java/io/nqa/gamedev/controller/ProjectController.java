@@ -1,12 +1,11 @@
 package io.nqa.gamedev.controller;
 
+import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.model.ProjectDTO;
 import io.nqa.gamedev.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/project")
@@ -23,5 +22,10 @@ public class ProjectController {
     @GetMapping(value = "getByProjectId/{projectId}")
     public CustomResponse getProjectByProjectId(@PathVariable String projectId) {
         return this.projectService.getProjectByProjectId(projectId);
+    }
+
+    @PostMapping(value = "saveProject")
+    public CustomResponse saveProject(@RequestBody ProjectDTO projectDTO) {
+        return this.projectService.saveProject(projectDTO);
     }
 }
