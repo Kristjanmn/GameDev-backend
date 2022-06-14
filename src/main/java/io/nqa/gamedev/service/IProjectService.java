@@ -3,6 +3,7 @@ package io.nqa.gamedev.service;
 import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.model.ProjectDTO;
 
 public interface IProjectService {
     Project getById(String databaseId);
@@ -12,6 +13,8 @@ public interface IProjectService {
     CustomResponse getProjectById(String databaseId);
 
     CustomResponse getProjectByProjectId(String projectId);
+
+    CustomResponse saveProject(ProjectDTO projectDTO);
 
     boolean hasScript(String projectId, Script script);
 

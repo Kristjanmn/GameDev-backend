@@ -5,6 +5,7 @@ import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.model.ProjectDTO;
 import io.nqa.gamedev.repository.ProjectRepository;
+import io.nqa.gamedev.service.global.GUIDGenerator;
 import io.nqa.gamedev.service.global.GlobalService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class ProjectService implements IProjectService {
     @Override
     public CustomResponse getProjectById(String databaseId) {
         if (GlobalService.isBlank(databaseId))
-            return new CustomResponse(false, "project databaseId was not included in request", null);
+            return new CustomResponse("project databaseId was not included in request", null);
         Project project = this.getById(databaseId);
         if (GlobalService.isNull(project))
-            return new CustomResponse(false, "Could not get project " + databaseId, null);
+            return new CustomResponse("Could not get project " + databaseId, null);
         return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
     }
 
@@ -68,11 +69,53 @@ public class ProjectService implements IProjectService {
     @Override
     public CustomResponse getProjectByProjectId(String projectId) {
         if (GlobalService.isBlank(projectId))
-            return new CustomResponse(false, "projectId was not included in request", null);
+            return new CustomResponse("projectId was not included in request", null);
         Project project = this.getByProjectId(projectId);
         if (GlobalService.isNull(project))
-            return new CustomResponse(false, "Could not get project " + projectId, null);
+            return new CustomResponse("Could not get project " + projectId, null);
         return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
+    }
+
+    @Override
+    public CustomResponse saveProject(ProjectDTO projectDTO) {
+        if (GlobalService.isNull(projectDTO))
+            return new CustomResponse("Provided project is NULL", null);
+        if (GlobalService.isBlank(projectDTO.getId())) {
+            // New project
+            if (GlobalService.isBlank(projectDTO.getTitle()))
+                return new CustomResponse("Provided project lacks title", null);
+            // Set default values if they are not provided
+            Project project = new Project();
+            // Id
+            project.setId(GUIDGenerator.generate());
+            // ProjectId
+            if (GlobalService.isBlank(projectDTO.getProjectId()))
+                project.setProjectId(project.getId());
+            else project.setProjectId(projectDTO.getProjectId());
+            // Title
+            project.setTitle(projectDTO.getTitle());
+            // Description
+            if (GlobalService.isBlank(projectDTO.getDescription()))
+                project.setDescription("");
+            else project.setDescription(projectDTO.getDescription());
+            return new CustomResponse(new ModelMapper().map(this.projectRepository.save(project), ProjectDTO.class));
+        } else {
+            // Existing project
+            Optional<Project> optProject = this.projectRepository.findByProjectIdEquals(projectDTO.getProjectId());
+            if (optProject.isEmpty())
+                return new CustomResponse("Could not find project", null);
+            Project project = optProject.get();
+            // ProjectId
+            if (!GlobalService.isBlank(projectDTO.getProjectId()))
+                project.setProjectId(projectDTO.getProjectId());
+            // Title
+            if (!GlobalService.isBlank(projectDTO.getTitle()))
+                project.setTitle(projectDTO.getTitle());
+            // Description
+            if (!GlobalService.isBlank(projectDTO.getDescription()))
+                project.setDescription(projectDTO.getDescription());
+            return new CustomResponse(new ModelMapper().map(this.projectRepository.save(project), ProjectDTO.class));
+        }
     }
 
     @Override
