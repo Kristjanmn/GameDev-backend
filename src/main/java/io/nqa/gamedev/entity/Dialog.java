@@ -20,4 +20,6 @@ public class Dialog {
 
     @OneToMany
     private List<DialogLine> lines;
+
+    private String comment;
 }

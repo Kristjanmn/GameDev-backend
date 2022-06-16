@@ -20,6 +20,10 @@ public class ProjectService implements IProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    // Next 4 functions look like they could be just 2 functions,
+    // but they need to be separate like that,
+    // because getById and getByProjectId are used also elsewhere.
+
     /**
      * Try to get project by database Id
      *
@@ -101,7 +105,7 @@ public class ProjectService implements IProjectService {
             return new CustomResponse(new ModelMapper().map(this.projectRepository.save(project), ProjectDTO.class));
         } else {
             // Existing project
-            Optional<Project> optProject = this.projectRepository.findByProjectIdEquals(projectDTO.getProjectId());
+            Optional<Project> optProject = this.projectRepository.findById(projectDTO.getId());
             if (optProject.isEmpty())
                 return new CustomResponse("Could not find project", null);
             Project project = optProject.get();
