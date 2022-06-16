@@ -1,9 +1,8 @@
 package io.nqa.gamedev.controller;
 
-import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.model.ProjectDTO;
-import io.nqa.gamedev.service.ProjectService;
+import io.nqa.gamedev.service.IProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +11,15 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
 
     @Autowired
-    private ProjectService projectService;
+    private IProjectService projectService;
 
     @GetMapping(value = "getById/{databaseId}")
-    public CustomResponse getProjectById(@PathVariable String databaseId) {
+    public CustomResponse getById(@PathVariable String databaseId) {
         return this.projectService.getProjectById(databaseId);
     }
 
     @GetMapping(value = "getByProjectId/{projectId}")
-    public CustomResponse getProjectByProjectId(@PathVariable String projectId) {
+    public CustomResponse getByProjectId(@PathVariable String projectId) {
         return this.projectService.getProjectByProjectId(projectId);
     }
 
