@@ -23,4 +23,14 @@ public class Script {
 
     @ManyToMany
     private List<ScriptVariable> variables;
+
+    private String comment;
+
+    public Script(String id, boolean global, String name, List<ScriptVariable> variables) {
+        this.id = id;
+        this.global = global;
+        this.name = name;
+        this.variables = variables;
+        this.comment = "";
+    }
 }
