@@ -14,12 +14,25 @@
 # API
 
 <p>This section explains API calls. For mentioned classes please scroll down.</p>
+<p><b>All responses are CustomResponse, any returned object is in CustomResponse.object</b></p>
 
 **Project**<br>
-***Returns CustomResponse with ProjectDTO as Object***
+***Get - returns ProjectDTO***
 ```
 /api/project/getById/{databaseId}
 /api/project/getByProjectId/{projectId}
+```
+***Save - returns ProjectDTO***
+```
+/api/project/saveProject (with ProjectDTO in request body)
+```
+
+**Dialog**<br>
+***Get dialog***
+```
+/api/dialog/getById/{databaseId}
+/api/dialog/getByDialogId/{dialogId}
+/api/dialog/getByProject/{projectDatabaseId}
 ```
 
 # Structure
@@ -102,6 +115,7 @@ Dialog {
     String id                   Database ID as GUID
     String dialogId             Id defined by user
     List<DialogLine> lines      List of dialog lines
+    String comment              Developer's comment
 }
 ```
 
@@ -168,6 +182,7 @@ Script {
                                 which is used for core functionality of this system.
     String name                 Name of the script function in C++
     List<ScriptVariable>        List of variables required by this script
+    String comment              Developer's comment
 }
 ```
 
