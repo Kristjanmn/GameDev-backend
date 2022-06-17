@@ -5,12 +5,14 @@ import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.model.ProjectDTO;
 import io.nqa.gamedev.repository.ProjectRepository;
+import io.nqa.gamedev.service.global.CookieService;
 import io.nqa.gamedev.service.global.GUIDGenerator;
 import io.nqa.gamedev.service.global.GlobalService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,12 +73,13 @@ public class ProjectService implements IProjectService {
      * @return CustomResponse with Project as Object
      */
     @Override
-    public CustomResponse getProjectByProjectId(String projectId) {
+    public CustomResponse getProjectByProjectId(String projectId, HttpServletResponse response) {
         if (GlobalService.isBlank(projectId))
             return new CustomResponse("projectId was not included in request", null);
         Project project = this.getByProjectId(projectId);
         if (GlobalService.isNull(project))
             return new CustomResponse("Could not get project " + projectId, null);
+        response.addCookie(CookieService.createProjectCookie(projectId));
         return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
     }
 
@@ -138,5 +141,12 @@ public class ProjectService implements IProjectService {
         }
         project.setScripts(projectScripts);
         this.projectRepository.save(project);
+    }
+
+    @Override
+    public boolean isProjectIdAvailable(String projectId) {
+        if (GlobalService.isBlank(projectId) ||
+                GlobalService.equalsAnyString(projectId, GlobalService.reservedIds)) return true;
+        return this.projectRepository.findByProjectIdEquals(projectId).isEmpty();
     }
 }
