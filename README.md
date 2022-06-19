@@ -17,22 +17,53 @@
 <p><b>All responses are CustomResponse, any returned object is in CustomResponse.object</b></p>
 
 **Project**<br>
-***Get - returns ProjectDTO***
 ```
-/api/project/getById/{databaseId}
-/api/project/getByProjectId/{projectId}
-```
-***Save - returns ProjectDTO***
-```
-/api/project/saveProject (with ProjectDTO in request body)
+// Next 2 also set the incoming cookie PROJECTID
+/api/project/getById/{databaseId}                   [GET]
+/api/project/getByProjectId/{projectId}             [GET]
+/api/project/checkAvailable/{projectId}             [GET]
+
+// Save project
+/api/project/saveProject (post ProjectDTO)          [POST]  [Cookie: PROJECTID = projectId]
 ```
 
 **Dialog**<br>
-***Get dialog***
 ```
-/api/dialog/getById/{databaseId}
-/api/dialog/getByDialogId/{dialogId}
-/api/dialog/getByProject/{projectDatabaseId}
+// Simplified method of getting all Dialogs associated with project.
+/api/dialog/                                        [GET]   [Cookie: PROJECTID = projectId]
+/api/dialog/getById/{databaseId}                    [GET]
+/api/dialog/getByDialogId/{dialogId}                [GET]
+/api/dialog/getByProject/{projectDatabaseId}        [GET]
+```
+
+**Quest**<br>
+```
+// Simplified method of getting all Quests associated with project.
+/api/quest/                                         [GET]   [Cookie: PROJECTID = projectId]
+/api/quest/getByProject/{projectDatabaseId}         [GET]
+
+// Check if an questID is available or already used in this project.
+/api/quest/checkIdAvailable/{questId}               [GET]   [Cookie: PROJECTID = projectId]
+
+// Save quest
+/api/quest/saveQuest/ (post Quest)                  [POST]  [Cookie: PROJECTID = projectId]
+```
+
+**Script**<br>
+```
+// Simplified method of getting all Scripts associated with project.
+/api/script/                                        [GET]   [Cookie: PROJECTID = projectId]
+/api/script/getByProject/{projectDatabaseId}        [GET]
+/api/script/saveScript (post ScriptDTO)             [POST]  [Cookie: PROJECTID = projectId]
+```
+
+**Cue**<br>
+```
+// Simplified method of getting all Cues associated with project.
+/api/cue/                                           [GET]   [Cookie: PROJECTID = projectId]
+/api/cue/getByProject/{projectDatabaseId}           [GET]
+/api/cue/checkIdAvailable/{cueId}                   [GET]   [Cookie: PROJECTID = projectId]
+/api/cue/saveCue/ (post Cue)                        [POST]  [Cookie: PROJECTID = projectId]
 ```
 
 # Structure
@@ -45,6 +76,9 @@
 <p>Global volatile service. This is used to check condition of multiple values at same time</p>
 
 ```
+String[] reservedIds
+    List of reserved IDs, which are not to be given to any user defined IDs
+
 isTrue(boolean ... args)
     Returns true if all input booleans are true
 
@@ -59,6 +93,10 @@ isBlank(String ... args)
 
 isEmpty(List ... args)
     Returns true if any of the provided arrays is empty
+
+equalsAnyString(String compareTo, String ... args)
+    Returns true if any input string equals compareTo string.
+    Case insensitive.
 ```
 
 #### GUIDGenerator
