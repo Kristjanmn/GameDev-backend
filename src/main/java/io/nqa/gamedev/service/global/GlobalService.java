@@ -7,6 +7,10 @@ import java.util.List;
 @Service
 public class GlobalService {
     private static volatile GlobalService globalService;
+    public static String[] reservedIds = {
+            "newproject", "new-project", "new_project",
+            "init", "test"
+    };
 
     private GlobalService() {}
 
@@ -17,7 +21,7 @@ public class GlobalService {
     /**
      * Check if all the booleans are true.
      *
-     * @param bools List of booleans
+     * @param booleans List of booleans
      * @return Are all booleans true?
      */
     public static boolean isTrue(boolean ... booleans) {
@@ -50,6 +54,14 @@ public class GlobalService {
         init();
         for (List list : lists) {
             if (list == null || list.isEmpty()) return true;
+        }
+        return false;
+    }
+
+    public static boolean equalsAnyString(String compareTo, String ... args) {
+        init();
+        for (String arg : args) {
+            if (compareTo.equalsIgnoreCase(arg)) return true;
         }
         return false;
     }

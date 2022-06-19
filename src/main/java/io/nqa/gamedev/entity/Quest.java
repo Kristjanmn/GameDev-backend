@@ -20,8 +20,8 @@ public class Quest {
 
     private String title;
 
-    private String comment;
-
     @OneToMany
     private List<QuestPhase> phases;
+
+    private String comment;
 }
