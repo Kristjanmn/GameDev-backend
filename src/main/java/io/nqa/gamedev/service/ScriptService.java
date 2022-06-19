@@ -94,12 +94,12 @@ public class ScriptService implements IScriptService {
      * Tries to fetch project's scripts.
      * Returns NULL if project was not found.
      *
-     * @param projectId Desired project id
+     * @param projectDatabaseId Desired project id
      * @return List of Scripts assigned to project
      */
     @Override
-    public List<Script> getProjectScripts(String projectId) {
-        Project project = this.projectService.getById(projectId);
+    public List<Script> getProjectScripts(String projectDatabaseId) {
+        Project project = this.projectService.getById(projectDatabaseId);
         if (GlobalService.isNull(project)) return null;
         return project.getScripts();
     }
@@ -110,16 +110,24 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
-    public CustomResponse getScripts(String projectId) {
-        if (GlobalService.isBlank(projectId)) return this.getScripts();
+    public CustomResponse getByProject(String projectDatabaseId) {
+        if (GlobalService.isBlank(projectDatabaseId)) return this.getScripts();
         List<Script> allScripts = this.getGlobalScripts();
-        List<Script> projectScripts = this.getProjectScripts(projectId);
+        List<Script> projectScripts = this.getProjectScripts(projectDatabaseId);
         if (GlobalService.notNull(projectScripts)) allScripts.addAll(projectScripts);
         return new CustomResponse(true, "Found " + allScripts.size() + " scripts", allScripts);
     }
 
     @Override
-    public CustomResponse getScript(String scriptId) {
+    public CustomResponse getByProjectId(String projectId) {
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return new CustomResponse("Invalid project", null);
+        return new CustomResponse(project.getScripts());
+    }
+
+    @Override
+    public CustomResponse getByScriptId(String scriptId) {
         if (GlobalService.isBlank(scriptId))
             return new CustomResponse(false, "scriptId was not included in request", null);
         Optional<Script> optScript = this.scriptRepository.findById(scriptId);
@@ -140,10 +148,15 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
-    public CustomResponse saveScript(String projectId, Script script) {
+    public CustomResponse saveScript(Script script, String projectId) {
         if (!this.projectService.hasScript(projectId, script)) this.projectService.saveScripts(projectId, script);
-        this.scriptRepository.save(script);
-        return null;
+        return new CustomResponse(this.scriptRepository.save(script));
+    }
+
+    @Override
+    public Script saveScript(Script script) {
+        this.scriptVariableRepository.saveAll(script.getVariables());
+        return this.scriptRepository.save(script);
     }
 
     @Override

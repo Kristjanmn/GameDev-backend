@@ -17,13 +17,17 @@ public interface IScriptService {
 
     CustomResponse getScripts();
 
-    CustomResponse getScripts(String projectId);    // List<Script>
+    CustomResponse getByProject(String projectDatabaseId);    // List<Script>
 
-    CustomResponse getScript(String scriptId);      // Script
+    CustomResponse getByProjectId(String projectId);
+
+    CustomResponse getByScriptId(String scriptId);      // Script
 
     void saveGlobalScript(Script script);
 
-    CustomResponse saveScript(String projectId, Script script);
+    CustomResponse saveScript(Script script, String projectId);
+
+    Script saveScript(Script script);
 
     Script newScript(String scriptName, boolean isGlobal, ScriptVariable ... vars);
 
