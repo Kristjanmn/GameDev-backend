@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,19 @@ public class ProjectService implements IProjectService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Override
+    public Project initProjectArrays(Project project) {
+        if (GlobalService.isNull(project.getDialogs()))
+            project.setDialogs(new ArrayList<>());
+        if (GlobalService.isNull(project.getQuests()))
+            project.setQuests(new ArrayList<>());
+        if (GlobalService.isNull(project.getScripts()))
+            project.setScripts(new ArrayList<>());
+        if (GlobalService.isNull(project.getCues()))
+            project.setCues(new ArrayList<>());
+        return project;
+    }
 
     // Next 4 functions look like they could be just 2 functions,
     // but they need to be separate like that,
@@ -57,12 +71,13 @@ public class ProjectService implements IProjectService {
      * @return CustomResponse with Project as Object
      */
     @Override
-    public CustomResponse getProjectById(String databaseId) {
+    public CustomResponse getProjectById(String databaseId, HttpServletResponse response) {
         if (GlobalService.isBlank(databaseId))
             return new CustomResponse("project databaseId was not included in request", null);
         Project project = this.getById(databaseId);
         if (GlobalService.isNull(project))
             return new CustomResponse("Could not get project " + databaseId, null);
+        response.addCookie(CookieService.createProjectCookie(project.getProjectId()));
         return new CustomResponse(new ModelMapper().map(project, ProjectDTO.class));
     }
 
@@ -105,6 +120,8 @@ public class ProjectService implements IProjectService {
             if (GlobalService.isBlank(projectDTO.getDescription()))
                 project.setDescription("");
             else project.setDescription(projectDTO.getDescription());
+            // Init arrays
+            project = this.initProjectArrays(project);
             return new CustomResponse(new ModelMapper().map(this.projectRepository.save(project), ProjectDTO.class));
         } else {
             // Existing project
@@ -121,8 +138,15 @@ public class ProjectService implements IProjectService {
             // Description
             if (!GlobalService.isBlank(projectDTO.getDescription()))
                 project.setDescription(projectDTO.getDescription());
+            // Init arrays for older projects, if they are NULL
+            this.initProjectArrays(project);
             return new CustomResponse(new ModelMapper().map(this.projectRepository.save(project), ProjectDTO.class));
         }
+    }
+
+    @Override
+    public Project saveProject(Project project) {
+        return this.projectRepository.save(project);
     }
 
     @Override
