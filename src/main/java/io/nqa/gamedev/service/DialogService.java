@@ -8,6 +8,7 @@ import io.nqa.gamedev.service.global.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,5 +50,49 @@ public class DialogService implements IDialogService {
         if (GlobalService.isNull(dialogs))
             return new CustomResponse("Project exists, but dialogs was null", null);
         return new CustomResponse(dialogs);
+    }
+
+    @Override
+    public CustomResponse getByProjectId(String projectId) {
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return new CustomResponse("Invalid project", null);
+        return new CustomResponse(project.getDialogs());
+    }
+
+    @Override
+    public CustomResponse saveDialog(Dialog dialog, String projectId) {
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return new CustomResponse("Project not found");
+        List<Dialog> dialogs = new ArrayList<>();
+        if (GlobalService.notNull(project.getDialogs()))
+            dialogs = project.getDialogs();
+        if (!dialogs.contains(dialog))
+            dialogs.add(dialog);
+        project.setDialogs(dialogs);
+        projectService.saveProject(project);
+        return new CustomResponse(dialog);
+    }
+
+    @Override
+    public Dialog saveDialog(Dialog dialog) {
+        return this.dialogRepository.save(dialog);
+    }
+
+    @Override
+    public boolean isDialogIdAvailable(String dialogId, String projectId) {
+        if (GlobalService.isBlank(dialogId, projectId))
+            return false;
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return false;
+        if (GlobalService.isNull(project.getDialogs()))
+            return true;
+        for (Dialog dialog : project.getDialogs()) {
+            if (dialog.getDialogId().equalsIgnoreCase(dialogId))
+                return false;
+        }
+        return true;
     }
 }
