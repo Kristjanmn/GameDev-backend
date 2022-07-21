@@ -1,17 +1,21 @@
 package io.nqa.gamedev.service;
 
-import io.nqa.gamedev.entity.Project;
-import io.nqa.gamedev.entity.Script;
-import io.nqa.gamedev.entity.ScriptVariable;
+import io.nqa.gamedev.entity.*;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.model.ScriptDTO;
+import io.nqa.gamedev.model.ScriptVariableDTO;
+import io.nqa.gamedev.repository.ScriptIndexRepository;
 import io.nqa.gamedev.repository.ScriptRepository;
+import io.nqa.gamedev.repository.ScriptVariableIndexRepository;
 import io.nqa.gamedev.repository.ScriptVariableRepository;
 import io.nqa.gamedev.service.global.GUIDGenerator;
 import io.nqa.gamedev.service.global.GlobalService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,10 +26,24 @@ public class ScriptService implements IScriptService {
     private ScriptRepository scriptRepository;
 
     @Autowired
+    private ScriptIndexRepository scriptIndexRepository;
+
+    @Autowired
     private ScriptVariableRepository scriptVariableRepository;
 
     @Autowired
+    private ScriptVariableIndexRepository scriptVariableIndexRepository;
+
+    @Autowired
     private IProjectService projectService;
+
+    @Override
+    public String generateGUID() {
+        String guid = GUIDGenerator.generate();
+        while (this.scriptRepository.findById(guid).isPresent())
+            guid = GUIDGenerator.generate();
+        return guid;
+    }
 
     /**
      * Create global scripts for basic functionality.
@@ -34,49 +52,49 @@ public class ScriptService implements IScriptService {
     @Override
     public void setupGlobalScripts() {
         this.saveGlobalScript(this.newScript("PassTime", true,
-                this.newScriptVar("EPassTime","Method"),
-                this.newScriptVar("int", "Hours"),
-                this.newScriptVar("int", "Minutes")));
+                this.newScriptVar(0, "EPassTime","Method"),
+                this.newScriptVar(1, "int", "Hours"),
+                this.newScriptVar(2, "int", "Minutes")));
 
         this.saveGlobalScript(this.newScript("GiveItem", true,
-                this.newScriptVar("FName","From"),
-                this.newScriptVar("FName", "To"),
-                this.newScriptVar("FName", "ItemID")));
+                this.newScriptVar(0, "FName","From"),
+                this.newScriptVar(1, "FName", "To"),
+                this.newScriptVar(2, "FName", "ItemID")));
 
         this.saveGlobalScript(this.newScript("GiveMoney", true,
-                this.newScriptVar("FName","From"),
-                this.newScriptVar("FName", "To"),
-                this.newScriptVar("int", "Amount")));
+                this.newScriptVar(0, "FName","From"),
+                this.newScriptVar(1, "FName", "To"),
+                this.newScriptVar(2, "int", "Amount")));
 
         this.saveGlobalScript(this.newScript("ChangeName", true,
-                this.newScriptVar("ACharacter*","Character"),
-                this.newScriptVar("FString", "NewName")));
+                this.newScriptVar(0, "ACharacter*","Character"),
+                this.newScriptVar(1, "FString", "NewName")));
 
         this.saveGlobalScript(this.newScript("UpdateQuestDescription", true,
-                this.newScriptVar("FName","QuestID"),
-                this.newScriptVar("FText", "Description")));
+                this.newScriptVar(0, "FName","QuestID"),
+                this.newScriptVar(1, "FText", "Description")));
 
         this.saveGlobalScript(this.newScript("SetQuestState", true,
-                this.newScriptVar("FName","QuestID"),
-                this.newScriptVar("EQuestState", "State")));
+                this.newScriptVar(0, "FName","QuestID"),
+                this.newScriptVar(1, "EQuestState", "State")));
 
         this.saveGlobalScript(this.newScript("SetQuestPhase", true,
-                this.newScriptVar("FName","QuestID"),
-                this.newScriptVar("FName", "Phase")));
+                this.newScriptVar(0, "FName","QuestID"),
+                this.newScriptVar(1, "FName", "Phase")));
 
         this.saveGlobalScript(this.newScript("SetDialogLocked", true,
-                this.newScriptVar("FName","CharacterID"),
-                this.newScriptVar("FName", "LineID"),
-                this.newScriptVar("boolean", "Locked")));
+                this.newScriptVar(0, "FName","CharacterID"),
+                this.newScriptVar(1, "FName", "LineID"),
+                this.newScriptVar(2, "boolean", "Locked")));
 
         this.saveGlobalScript(this.newScript("SetDialogsLocked", true,
-                this.newScriptVar("FName","CharacterID"),
-                this.newScriptVar("TArray<FName>", "LineIDs"),
-                this.newScriptVar("boolean", "Locked")));
+                this.newScriptVar(0, "FName","CharacterID"),
+                this.newScriptVar(1, "TArray<FName>", "LineIDs"),
+                this.newScriptVar(2, "boolean", "Locked")));
 
         this.saveGlobalScript(this.newScript("SetNextLine", true,
-                this.newScriptVar("FName", "CharacterID"),
-                this.newScriptVar("FName", "LineID")));
+                this.newScriptVar(0, "FName", "CharacterID"),
+                this.newScriptVar(1, "FName", "LineID")));
     }
 
     /**
@@ -86,6 +104,9 @@ public class ScriptService implements IScriptService {
      */
     @Override
     public List<Script> getGlobalScripts() {
+        // Just in case, to make sure they exist..
+        this.setupGlobalScripts();
+
         Optional<List<Script>> optScripts = this.scriptRepository.findAllByGlobalIsTrue();
         return optScripts.orElseGet(ArrayList::new);
     }
@@ -123,7 +144,14 @@ public class ScriptService implements IScriptService {
         Project project = this.projectService.getByProjectId(projectId);
         if (GlobalService.isNull(project))
             return new CustomResponse("Invalid project", null);
-        return new CustomResponse(project.getScripts());
+        List<Script> scripts = this.getGlobalScripts();
+        scripts.addAll(project.getScripts());
+        // Turn scripts into DTO format
+        List<ScriptDTO> scriptDTOs = new ArrayList<>();
+        for (Script script : scripts) {
+            scriptDTOs.add(this.getScriptDTO(script));
+        }
+        return new CustomResponse(scriptDTOs);
     }
 
     @Override
@@ -137,10 +165,17 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
+    public ScriptDTO getScriptDTO(Script script) {
+        ScriptDTO scriptDTO = new ModelMapper().map(script, ScriptDTO.class);
+        scriptDTO.setVariables(this.sortIndexedVariables_DTO(script.getVariables()));
+        return scriptDTO;
+    }
+
+    @Override
     public void saveGlobalScript(Script script) {
         if (this.scriptExists(script.getName(), script.isGlobal(), script.getVariables())) return;
         if (GlobalService.notNull(script)) {
-            for (ScriptVariable var : script.getVariables()) {
+            for (ScriptVariableIndex var : script.getVariables()) {
                 this.saveScriptVar(var);
             }
             this.scriptRepository.save(script);
@@ -155,16 +190,20 @@ public class ScriptService implements IScriptService {
 
     @Override
     public Script saveScript(Script script) {
-        this.scriptVariableRepository.saveAll(script.getVariables());
+        List<ScriptVariable> variables = new ArrayList<>();
+        for (ScriptVariableIndex var : script.getVariables()) {
+            variables.add(var.getVariable());
+        }
+        this.scriptVariableRepository.saveAll(variables);
         return this.scriptRepository.save(script);
     }
 
     @Override
-    public Script newScript(String scriptName, boolean isGlobal, ScriptVariable ... vars) {
+    public Script newScript(String scriptName, boolean isGlobal, ScriptVariableIndex ... vars) {
         String guid = GUIDGenerator.generate();
         while (this.scriptRepository.findById(guid).isPresent()) guid = GUIDGenerator.generate();
-        List<ScriptVariable> variables = new ArrayList<>();
-        for (ScriptVariable var : vars) {
+        List<ScriptVariableIndex> variables = new ArrayList<>();
+        for (ScriptVariableIndex var : vars) {
             if (var != null) variables.add(var);
         }
         return new Script(guid, isGlobal, scriptName, variables);
@@ -189,6 +228,19 @@ public class ScriptService implements IScriptService {
         return new ScriptVariable(guid, varType, varName);
     }
 
+    @Override
+    public ScriptVariableIndex newScriptVar(int index, String varType, String varName) {
+        String guid = GUIDGenerator.generate();
+        ScriptVariable scriptVariable = this.newScriptVar(varType, varName);
+        // Check if such variable already exists.
+        Optional<ScriptVariableIndex> optVarIndex = findScriptVarByVariable(scriptVariable);
+        if (optVarIndex.isPresent())
+            return optVarIndex.get();
+        // Create new variable if it does not already exist.
+        while (this.scriptVariableRepository.findById(guid).isPresent()) guid = GUIDGenerator.generate();
+        return new ScriptVariableIndex(guid, scriptVariable, index);
+    }
+
     /**
      * Save new script variable, if it does not exist already.
      *
@@ -201,8 +253,19 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
+    public void saveScriptVar(ScriptVariableIndex var) {
+        this.saveScriptVar(var.getVariable());
+        this.scriptVariableIndexRepository.save(var);
+    }
+
+    @Override
     public Optional<ScriptVariable> findScriptVarByTypeName(String varType, String varName) {
         return this.scriptVariableRepository.findByVariableTypeEqualsAndVariableNameEquals(varType, varName);
+    }
+
+    @Override
+    public Optional<ScriptVariableIndex> findScriptVarByVariable(ScriptVariable variable) {
+        return this.scriptVariableIndexRepository.findByVariableEquals(variable);
     }
 
     /**
@@ -214,7 +277,7 @@ public class ScriptService implements IScriptService {
      * @return Does script exist?
      */
     @Override
-    public boolean scriptExists(String scriptName, boolean isGlobal, List<ScriptVariable> variables) {
+    public boolean scriptExists(String scriptName, boolean isGlobal, List<ScriptVariableIndex> variables) {
         // Getting every function with same name and global variables, as repository does not like to compare arrays.
         List<Script> scripts = this.scriptRepository.findAllByNameEqualsAndGlobalEquals(scriptName, isGlobal);
         for (Script script : scripts) {
@@ -229,5 +292,56 @@ public class ScriptService implements IScriptService {
     @Override
     public boolean scriptVariableExists(String varType, String varName) {
         return this.findScriptVarByTypeName(varType, varName).isPresent();
+    }
+
+    @Override
+    public boolean isScriptNameAvailable(String scriptName, String projectId) {
+        if (GlobalService.isBlank(scriptName, projectId))
+            return false;
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return false;
+        if (GlobalService.isNull(project.getQuests()))
+            return true;
+        for (Script script : project.getScripts()) {
+            if (script.getName().equalsIgnoreCase(scriptName))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Make sure variables are in correct order.
+     *
+     * @param indexedVariables List of ScriptVariableIndex
+     * @return List of ScriptVariable in correct order
+     */
+    @Override
+    public List<ScriptVariable> sortIndexedVariables(List<ScriptVariableIndex> indexedVariables) {
+        indexedVariables.sort(Comparator.comparingInt(ScriptVariableIndex::getZOrder));
+        List<ScriptVariable> sortedVariables = new ArrayList<>();
+        for (ScriptVariableIndex iVar : indexedVariables) {
+            sortedVariables.add(iVar.getVariable());
+        }
+        return sortedVariables;
+    }
+
+    /**
+     * Similar to regular sortIndexedVariables,
+     * except this returns list of ScriptVariableDTO.
+     *
+     * @param indexedVariables List of ScriptVariableIndex
+     * @return List of ScriptVariableDTO in correct order
+     */
+    @Override
+    public List<ScriptVariableDTO> sortIndexedVariables_DTO(List<ScriptVariableIndex> indexedVariables) {
+        indexedVariables.sort(Comparator.comparingInt(ScriptVariableIndex::getZOrder));
+        List<ScriptVariableDTO> sortedVariableDTOs = new ArrayList<>();
+        for (ScriptVariableIndex iVar : indexedVariables) {
+            sortedVariableDTOs.add(
+                    new ModelMapper().map(iVar.getVariable(), ScriptVariableDTO.class)
+            );
+        }
+        return sortedVariableDTOs;
     }
 }
