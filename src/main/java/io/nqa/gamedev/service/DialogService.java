@@ -1,9 +1,13 @@
 package io.nqa.gamedev.service;
 
 import io.nqa.gamedev.entity.Dialog;
+import io.nqa.gamedev.entity.DialogLine;
 import io.nqa.gamedev.entity.Project;
+import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.repository.DialogLineRepository;
 import io.nqa.gamedev.repository.DialogRepository;
+import io.nqa.gamedev.service.global.GUIDGenerator;
 import io.nqa.gamedev.service.global.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +23,26 @@ public class DialogService implements IDialogService {
     private DialogRepository dialogRepository;
 
     @Autowired
+    private DialogLineRepository dialogLineRepository;
+
+    @Autowired
     private IProjectService projectService;
+
+    @Override
+    public String generateGUID() {
+        String guid = GUIDGenerator.generate();
+        while (this.dialogRepository.findById(guid).isPresent())
+            guid = GUIDGenerator.generate();
+        return guid;
+    }
+
+    @Override
+    public String generateGUID_line() {
+        String guid = GUIDGenerator.generate();
+        while (this.dialogLineRepository.findById(guid).isPresent())
+            guid = GUIDGenerator.generate();
+        return guid;
+    }
 
     @Override
     public CustomResponse getById(String databaseId) {
@@ -65,12 +88,26 @@ public class DialogService implements IDialogService {
         Project project = this.projectService.getByProjectId(projectId);
         if (GlobalService.isNull(project))
             return new CustomResponse("Project not found");
+        if (GlobalService.isBlank(dialog.getId()))
+            dialog.setId(this.generateGUID());
+        if (GlobalService.isNull(dialog.getLines()))
+            dialog.setLines(new ArrayList<>());
+        if (!this.doesDialogLineExist(dialog, "INIT")) {
+            DialogLine initLine = new DialogLine(this.generateGUID_line(), "INIT", "",
+                    new ArrayList<>(), null, 0, "", new ArrayList<>(), false,
+                    "This line is always first and is primarily used for scripts.", 0);
+            List<DialogLine> lines = dialog.getLines();
+            lines.add(0, initLine);
+            dialog.setLines(lines);
+        }
+
         List<Dialog> dialogs = new ArrayList<>();
         if (GlobalService.notNull(project.getDialogs()))
             dialogs = project.getDialogs();
         if (!dialogs.contains(dialog))
             dialogs.add(dialog);
         project.setDialogs(dialogs);
+        //this.dialogLineRepository.saveAll(dialog.getLines());
         projectService.saveProject(project);
         return new CustomResponse(dialog);
     }
@@ -94,5 +131,13 @@ public class DialogService implements IDialogService {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean doesDialogLineExist(Dialog dialog, String lineId) {
+        for (DialogLine line : dialog.getLines()) {
+            if (line.getLineId().equalsIgnoreCase(lineId)) return true;
+        }
+        return false;
     }
 }
