@@ -1,6 +1,9 @@
 package io.nqa.gamedev.model;
 
+import lombok.Data;
+
+@Data
 public class ScriptVariableDTO {
-    private String type;
-    private String name;
+    String type;
+    String name;
 }

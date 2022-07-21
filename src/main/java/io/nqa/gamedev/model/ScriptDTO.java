@@ -6,6 +6,8 @@ import java.util.List;
 
 @Data
 public class ScriptDTO {
-    private String name;
-    private List<ScriptVariableDTO> variables;
+    boolean global;
+    String name;
+    List<ScriptVariableDTO> variables;
+    String comment;
 }
