@@ -131,6 +131,19 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
+    public CustomResponse getById(String scriptId, String projectId) {
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project, project.getScripts()))
+            return new CustomResponse("Invalid project", null);
+        for (Script script : project.getScripts()) {
+            if (scriptId.contentEquals(script.getId())) {
+                return new CustomResponse(this.getScriptDTO(script));
+            }
+        }
+        return new CustomResponse("No such script was found", null);
+    }
+
+    @Override
     public CustomResponse getByProject(String projectDatabaseId) {
         if (GlobalService.isBlank(projectDatabaseId)) return this.getScripts();
         List<Script> allScripts = this.getGlobalScripts();

@@ -32,6 +32,16 @@ public class ScriptController {
         return this.scriptService.getByProject(projectDatabaseId);
     }
 
+    @GetMapping(value = "getById/{scriptDatabaseId}")
+    public CustomResponse getByScriptDatabaseId(@PathVariable String scriptDatabaseId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
+        String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
+        if (GlobalService.isBlank(scriptDatabaseId, projectId))
+            return new CustomResponse("Invalid parameters", null);
+        return scriptService.getById(scriptDatabaseId, projectId);
+    }
+
     @GetMapping(value = "checkIdAvailable/{scriptName}")
     public CustomResponse checkScriptNameAvailable(@PathVariable String scriptName, HttpServletRequest request) {
         if (request.getCookies() == null)

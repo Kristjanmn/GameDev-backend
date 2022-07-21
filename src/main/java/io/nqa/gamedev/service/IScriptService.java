@@ -23,6 +23,8 @@ public interface IScriptService {
 
     CustomResponse getScripts();
 
+    CustomResponse getById(String scriptId, String projectId);
+
     CustomResponse getByProject(String projectDatabaseId);    // List<Script>
 
     CustomResponse getByProjectId(String projectId);
