@@ -4,6 +4,7 @@ import io.nqa.gamedev.entity.Cue;
 import io.nqa.gamedev.entity.Project;
 import io.nqa.gamedev.model.CustomResponse;
 import io.nqa.gamedev.repository.CueRepository;
+import io.nqa.gamedev.service.global.GUIDGenerator;
 import io.nqa.gamedev.service.global.GlobalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,14 @@ public class CueService implements ICueService {
 
     @Autowired
     private IProjectService projectService;
+
+    @Override
+    public String generateGUID() {
+        String guid = GUIDGenerator.generate();
+        while (this.cueRepository.findById(guid).isPresent())
+            guid = GUIDGenerator.generate();
+        return guid;
+    }
 
     @Override
     public CustomResponse getByProject(String projectDatabaseId) {
@@ -40,22 +49,6 @@ public class CueService implements ICueService {
     }
 
     @Override
-    public boolean isCueIdAvailable(String cueId, String projectId) {
-        if (GlobalService.isBlank(cueId, projectId))
-            return false;
-        Project project = this.projectService.getByProjectId(projectId);
-        if (GlobalService.isNull(project))
-            return false;
-        if (GlobalService.isNull(project.getCues()))
-            return true;
-        for (Cue cue : project.getCues()) {
-            if (cue.getCueId().equalsIgnoreCase(cueId))
-                return false;
-        }
-        return true;
-    }
-
-    @Override
     public CustomResponse saveCue(Cue cue, String projectId) {
         Project project = this.projectService.getByProjectId(projectId);
         if (GlobalService.isNull(project))
@@ -73,5 +66,21 @@ public class CueService implements ICueService {
     @Override
     public Cue saveCue(Cue cue) {
         return this.cueRepository.save(cue);
+    }
+
+    @Override
+    public boolean isCueIdAvailable(String cueId, String projectId) {
+        if (GlobalService.isBlank(cueId, projectId))
+            return false;
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return false;
+        if (GlobalService.isNull(project.getCues()))
+            return true;
+        for (Cue cue : project.getCues()) {
+            if (cue.getCueId().equalsIgnoreCase(cueId))
+                return false;
+        }
+        return true;
     }
 }
