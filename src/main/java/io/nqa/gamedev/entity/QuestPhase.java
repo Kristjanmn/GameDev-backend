@@ -21,7 +21,10 @@ public class QuestPhase {
     private String description;
 
     @ManyToMany
-    private List<Script> script;
+    private List<ScriptIndex> script;
 
     private String comment;
+
+    // Sadly I need to use it for ordering items in array, which is very important.
+    private int zOrder;
 }
