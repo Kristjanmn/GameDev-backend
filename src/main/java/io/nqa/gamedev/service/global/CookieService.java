@@ -1,5 +1,6 @@
 package io.nqa.gamedev.service.global;
 
+import io.nqa.gamedev.model.CustomResponse;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -41,5 +42,9 @@ public class CookieService {
         cookie.setSecure(true);
         cookie.setMaxAge(0);
         return cookie;
+    }
+
+    public static CustomResponse noCookiesInRequest() {
+        return new CustomResponse("ERROR: Request did not provide cookies.", null);
     }
 }
