@@ -24,6 +24,14 @@ public class ProjectService implements IProjectService {
     private ProjectRepository projectRepository;
 
     @Override
+    public String generateGUID() {
+        String guid = GUIDGenerator.generate();
+        while (this.projectRepository.findById(guid).isPresent())
+            guid = GUIDGenerator.generate();
+        return guid;
+    }
+
+    @Override
     public Project initProjectArrays(Project project) {
         if (GlobalService.isNull(project.getDialogs()))
             project.setDialogs(new ArrayList<>());
@@ -109,7 +117,7 @@ public class ProjectService implements IProjectService {
             // Set default values if they are not provided
             Project project = new Project();
             // Id
-            project.setId(GUIDGenerator.generate());
+            project.setId(this.generateGUID());
             // ProjectId
             if (GlobalService.isBlank(projectDTO.getProjectId()))
                 project.setProjectId(project.getId());
@@ -169,8 +177,8 @@ public class ProjectService implements IProjectService {
 
     @Override
     public boolean isProjectIdAvailable(String projectId) {
-        if (GlobalService.isBlank(projectId) ||
-                GlobalService.equalsAnyString(projectId, GlobalService.reservedIds)) return true;
+        if (GlobalService.isBlank(projectId)) return true;
+        if (GlobalService.equalsAnyString_ignoreCase(projectId, GlobalService.reservedIds)) return false;
         return this.projectRepository.findByProjectIdEquals(projectId).isEmpty();
     }
 }

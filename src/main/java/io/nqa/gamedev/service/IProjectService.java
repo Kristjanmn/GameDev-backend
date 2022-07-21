@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface IProjectService {
 
+    String generateGUID();
+
     Project initProjectArrays(Project project);
 
     Project getById(String databaseId);
