@@ -61,6 +61,14 @@ public class GlobalService {
     public static boolean equalsAnyString(String compareTo, String ... args) {
         init();
         for (String arg : args) {
+            if (compareTo.equals(arg)) return true;
+        }
+        return false;
+    }
+
+    public static boolean equalsAnyString_ignoreCase(String compareTo, String ... args) {
+        init();
+        for (String arg : args) {
             if (compareTo.equalsIgnoreCase(arg)) return true;
         }
         return false;
