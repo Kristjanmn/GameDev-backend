@@ -1,12 +1,16 @@
 package io.nqa.gamedev.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "line")
 public class DialogLine {
 
@@ -15,15 +19,18 @@ public class DialogLine {
 
     private String lineId;
 
-    private int listOrder;
+    //private int listOrder;
 
     // dialog type
 
     private String nextLine;
 
     // choices
-    @ManyToMany
-    private List<DialogLine> choices;       // will most likely turn into infinite loop very shortly.
+    //@ManyToMany
+    // choice zIndex, choice dialogId
+    //private Map<Integer, String> choices;
+    @ElementCollection
+    private List<String> choices;       // will most likely turn into infinite loop very shortly.
                                             // It does not like List<String>, and I can't
                                             // think of anything else at this time.
 
@@ -39,9 +46,11 @@ public class DialogLine {
     private String lineText;
 
     @ManyToMany
-    private List<Script> script;
+    private List<ScriptIndex> script;
 
     private boolean locked;
 
     private String comment;
+
+    private int zOrder;
 }
