@@ -19,6 +19,8 @@ public class DialogController {
 
     @GetMapping(value = "")
     public CustomResponse getAllByProjectId_Cookie(HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid cookie", null);
@@ -44,6 +46,8 @@ public class DialogController {
 
     @PostMapping(value = "saveDialog")
     public CustomResponse saveDialog(@RequestBody Dialog dialog, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isNull(dialog) || GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid parameters", null);
@@ -52,6 +56,8 @@ public class DialogController {
 
     @GetMapping(value = "checkIdAvailable/{dialogId}")
     public CustomResponse checkDialogIdAvailable(@PathVariable String dialogId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(dialogId, projectId))
             return new CustomResponse("Invalid parameters", null);

@@ -19,6 +19,8 @@ public class CueController {
 
     @GetMapping(value = "")
     public CustomResponse getAllByProjectId_Cookie(HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid cookie", null);
@@ -34,6 +36,8 @@ public class CueController {
 
     @GetMapping(value = "checkIdAvailable/{cueId}")
     public CustomResponse checkCueIdAvailable(@PathVariable String cueId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(cueId, projectId))
             return new CustomResponse("Invalid parameters", null);
@@ -44,6 +48,8 @@ public class CueController {
 
     @PostMapping(value = "saveCue")
     public CustomResponse saveCue(@RequestBody Cue cue, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isNull(cue) || GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid parameters", null);
