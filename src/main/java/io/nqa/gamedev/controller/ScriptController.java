@@ -19,6 +19,8 @@ public class ScriptController {
 
     @GetMapping(value = "")
     public CustomResponse getAllByProjectId_Cookie(HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid cookie", null);
@@ -30,8 +32,22 @@ public class ScriptController {
         return this.scriptService.getByProject(projectDatabaseId);
     }
 
+    @GetMapping(value = "checkIdAvailable/{scriptName}")
+    public CustomResponse checkScriptNameAvailable(@PathVariable String scriptName, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
+        String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
+        if (GlobalService.isBlank(scriptName, projectId))
+            return new CustomResponse("Invalid parameters", null);
+        boolean isAvailable = this.scriptService.isScriptNameAvailable(scriptName, projectId);
+        if (isAvailable) return new CustomResponse("script name is available", scriptName);
+        return new CustomResponse("script name not available", null);
+    }
+
     @PostMapping(value = "saveScript")
     public CustomResponse saveScript(@RequestBody Script script, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isNull(script) || GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid parameters", null);

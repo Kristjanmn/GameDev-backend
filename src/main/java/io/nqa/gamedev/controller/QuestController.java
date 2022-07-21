@@ -15,10 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 public class QuestController {
 
     @Autowired
-    IQuestService questService;
+    private IQuestService questService;
 
     @GetMapping(value = "")
     public CustomResponse getAllByProjectId_Cookie(HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid cookie", null);
@@ -30,18 +32,44 @@ public class QuestController {
         return questService.getByProject(projectDatabaseId);
     }
 
+    @GetMapping(value = "getById/{questDatabaseId}")
+    public CustomResponse getByQuestDatabaseId(@PathVariable String questDatabaseId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
+        String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
+        if (GlobalService.isBlank(questDatabaseId, projectId))
+            return new CustomResponse("Invalid parameters", null);
+        return questService.getById(questDatabaseId, projectId);
+    }
+
     @GetMapping(value = "checkIdAvailable/{questId}")
     public CustomResponse checkQuestIdAvailable(@PathVariable String questId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isBlank(questId, projectId))
-            return new CustomResponse("invalid parameters", null);
+            return new CustomResponse("Invalid parameters", null);
         boolean isAvailable = this.questService.isQuestIdAvailable(questId, projectId);
+        if (isAvailable) return new CustomResponse("questId is available", questId);
+        return new CustomResponse("questId not available", null);
+    }
+
+    @GetMapping(value = "checkIdAvailable/{questDatabaseId}/{questId}")
+    public CustomResponse checkQuestIdAvailable(@PathVariable String questDatabaseId, @PathVariable String questId, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
+        String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
+        if (GlobalService.isBlank(questDatabaseId, questId, projectId))
+            return new CustomResponse("Invalid parameters", null);
+        boolean isAvailable = this.questService.isQuestIdAvailable(questDatabaseId, questId, projectId);
         if (isAvailable) return new CustomResponse("questId is available", questId);
         return new CustomResponse("questId not available", null);
     }
 
     @PostMapping(value = "saveQuest")
     public CustomResponse saveQuest(@RequestBody Quest quest, HttpServletRequest request) {
+        if (request.getCookies() == null)
+            return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
         if (GlobalService.isNull(quest) || GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid parameters", null);

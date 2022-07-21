@@ -41,9 +41,12 @@
 // Simplified method of getting all Quests associated with project.
 /api/quest/                                         [GET]   [Cookie: PROJECTID = projectId]
 /api/quest/getByProject/{projectDatabaseId}         [GET]
+/api/quest/getById/{questDatabaseId}                [GET]   [Cookie: PROJECTID = projectId]
+
 
 // Check if an questID is available or already used in this project.
-/api/quest/checkIdAvailable/{questId}               [GET]   [Cookie: PROJECTID = projectId]
+/api/quest/checkIdAvailable/{questId}                   [GET]   [Cookie: PROJECTID = projectId]
+/api/quest/checkIdAvailable/{questDatabaseId}/{questId} [GET]   [Cookie: PROJECTID = projectId]
 
 // Save quest
 /api/quest/saveQuest/ (post Quest)                  [POST]  [Cookie: PROJECTID = projectId]
@@ -54,6 +57,7 @@
 // Simplified method of getting all Scripts associated with project.
 /api/script/                                        [GET]   [Cookie: PROJECTID = projectId]
 /api/script/getByProject/{projectDatabaseId}        [GET]
+/api/script/checkIdAvailable/{scriptName}           [GET]   [Cookie: PROJECTID = projectId]
 /api/script/saveScript (post ScriptDTO)             [POST]  [Cookie: PROJECTID = projectId]
 ```
 
