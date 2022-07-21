@@ -22,15 +22,15 @@ public class Script {
     private String name;
 
     @ManyToMany
-    private List<ScriptVariable> variables;
+    private List<ScriptVariableIndex> variables;
 
-    public Script(String id, boolean global, String name, List<ScriptVariable> variables) {
+    private String comment;
+
+    public Script(String id, boolean global, String name, List<ScriptVariableIndex> variables) {
         this.id = id;
         this.global = global;
         this.name = name;
         this.variables = variables;
         this.comment = "";
     }
-
-    private String comment;
 }
