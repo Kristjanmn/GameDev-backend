@@ -145,6 +145,16 @@ Project {
     List<Cue> cues              List of cues (audio files) made for this project
 }
 ```
+<p>ProjectDTO class</p>
+
+```
+ProjectDTO {
+    String id
+    String projectId
+    String title
+    String description
+}
+```
 
 ### Dialog classes
 
@@ -214,7 +224,8 @@ QuestPhase {
 ### Script classes
 
 #### Script
-<p>Script class. Similar to what's in C++ system.</p>
+<p>Script class.<br>
+Similar to what's in C++ system.</p>
 
 ```
 Database table "script"
@@ -225,6 +236,28 @@ Script {
     String name                 Name of the script function in C++
     List<ScriptVariable>        List of variables required by this script
     String comment              Developer's comment
+}
+```
+<p>ScriptDTO class</p>
+
+```
+ScriptDTO {
+    String id
+    boolean global
+    String name
+    List<ScriptVariableDTO> variables
+    String comment
+}
+```
+<p>ScriptIndex class<br>
+Used in script lines to ensure correct order of execution.</p>
+
+```
+Database table "script_index"
+ScriptIndex {
+    String id                   Database ID as GUID
+    Script script               Indexed Script
+    int zOrder                  Script's index in array
 }
 ```
 
@@ -239,9 +272,29 @@ ScriptVariable {
     String variableName         Variable name used in engine
 }
 ```
+<p>ScriptVariableDTO class</p>
+
+```
+ScriptVariableDTO {
+    String type
+    String name
+}
+```
+<p>ScriptVariableIndex class<br>
+Used to make sure Script variables are in correct order.</p>
+
+```
+Database table "variable_index"
+ScriptVariableIndex {
+    String id                   Database ID as GUID
+    ScriptVariable variable     Script variable
+    int zOrder                  Variable's index in Script
+}
+```
 
 #### Cue
-<p>Cue class. Used for audio files</p>
+<p>Cue class.<br>
+Used for audio files</p>
 
 ```
 Database table "cue"
