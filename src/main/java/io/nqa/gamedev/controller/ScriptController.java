@@ -1,7 +1,7 @@
 package io.nqa.gamedev.controller;
 
-import io.nqa.gamedev.entity.Script;
 import io.nqa.gamedev.model.CustomResponse;
+import io.nqa.gamedev.model.ScriptDTO;
 import io.nqa.gamedev.service.IScriptService;
 import io.nqa.gamedev.service.global.CookieService;
 import io.nqa.gamedev.service.global.GlobalService;
@@ -55,12 +55,12 @@ public class ScriptController {
     }
 
     @PostMapping(value = "saveScript")
-    public CustomResponse saveScript(@RequestBody Script script, HttpServletRequest request) {
+    public CustomResponse saveScript(@RequestBody ScriptDTO scriptDTO, HttpServletRequest request) {
         if (request.getCookies() == null)
             return CookieService.noCookiesInRequest();
         String projectId = CookieService.getCookieByName(request.getCookies(), CookieService.COOKIE_PROJECT_ID).getValue();
-        if (GlobalService.isNull(script) || GlobalService.isBlank(projectId))
+        if (GlobalService.isNull(scriptDTO) || GlobalService.isBlank(projectId))
             return new CustomResponse("Invalid parameters", null);
-        return this.scriptService.saveScript(script, projectId);
+        return this.scriptService.saveScript(scriptDTO, projectId);
     }
 }

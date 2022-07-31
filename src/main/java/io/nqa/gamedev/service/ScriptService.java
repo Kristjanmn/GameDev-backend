@@ -137,7 +137,7 @@ public class ScriptService implements IScriptService {
             return new CustomResponse("Invalid project", null);
         for (Script script : project.getScripts()) {
             if (scriptId.contentEquals(script.getId())) {
-                return new CustomResponse(this.getScriptDTO(script));
+                return new CustomResponse(this.convertScriptToScriptDTO(script));
             }
         }
         return new CustomResponse("No such script was found", null);
@@ -162,7 +162,7 @@ public class ScriptService implements IScriptService {
         // Turn scripts into DTO format
         List<ScriptDTO> scriptDTOs = new ArrayList<>();
         for (Script script : scripts) {
-            scriptDTOs.add(this.getScriptDTO(script));
+            scriptDTOs.add(this.convertScriptToScriptDTO(script));
         }
         return new CustomResponse(scriptDTOs);
     }
@@ -178,10 +178,24 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
-    public ScriptDTO getScriptDTO(Script script) {
+    public ScriptDTO convertScriptToScriptDTO(Script script) {
         ScriptDTO scriptDTO = new ModelMapper().map(script, ScriptDTO.class);
         scriptDTO.setVariables(this.sortIndexedVariables_DTO(script.getVariables()));
         return scriptDTO;
+    }
+
+    @Override
+    public Script convertScriptDTOToScript(ScriptDTO scriptDTO) {
+        Script script = new ModelMapper().map(scriptDTO, Script.class);
+        List<ScriptVariableIndex> scriptVariables = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+        for (int i = 0; i < scriptDTO.getVariables().size(); i++) {
+            ScriptVariableIndex indexedVariable = modelMapper.map(scriptDTO.getVariables().get(i), ScriptVariableIndex.class);
+            indexedVariable.setZOrder(i);
+            scriptVariables.add(modelMapper.map(indexedVariable, ScriptVariableIndex.class));
+        }
+        script.setVariables(scriptVariables);
+        return script;
     }
 
     @Override
@@ -196,11 +210,34 @@ public class ScriptService implements IScriptService {
     }
 
     @Override
-    public CustomResponse saveScript(Script script, String projectId) {
-        if (!this.projectService.hasScript(projectId, script)) this.projectService.saveScripts(projectId, script);
+    public CustomResponse saveScript(ScriptDTO scriptDTO, String projectId) {
+        Project project = this.projectService.getByProjectId(projectId);
+        if (GlobalService.isNull(project))
+            return new CustomResponse("Invalid project", null);
+
+        // Init potential blank/null variables
+        if (GlobalService.isBlank(scriptDTO.getId())) {
+            String guid = GUIDGenerator.generate();
+            while (this.scriptIndexRepository.findById(guid).isPresent())
+                guid = GUIDGenerator.generate();
+            scriptDTO.setId(guid);
+        }
+
+        // Convert ScriptDTO -> Script and save
+        Script script = this.saveScript(
+                this.convertScriptDTOToScript(scriptDTO)
+        );
+        if (!this.projectService.hasScript(projectId, script))
+            this.projectService.saveScripts(projectId, script);
         return new CustomResponse(this.scriptRepository.save(script));
     }
 
+    /**
+     * Save Script and all it's variables.
+     *
+     * @param script Script to save
+     * @return saved Script
+     */
     @Override
     public Script saveScript(Script script) {
         List<ScriptVariable> variables = new ArrayList<>();

@@ -31,11 +31,13 @@ public interface IScriptService {
 
     CustomResponse getByScriptId(String scriptId);      // Script
 
-    ScriptDTO getScriptDTO(Script script);
+    ScriptDTO convertScriptToScriptDTO(Script script);
+
+    Script convertScriptDTOToScript(ScriptDTO scriptDTO);
 
     void saveGlobalScript(Script script);
 
-    CustomResponse saveScript(Script script, String projectId);
+    CustomResponse saveScript(ScriptDTO scriptDTO, String projectId);
 
     Script saveScript(Script script);
 
