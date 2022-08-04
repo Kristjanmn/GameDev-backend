@@ -85,12 +85,12 @@ public class ScriptService implements IScriptService {
         this.saveGlobalScript(this.newScript("SetDialogLocked", true,
                 this.newScriptVar(0, "FName","CharacterID"),
                 this.newScriptVar(1, "FName", "LineID"),
-                this.newScriptVar(2, "boolean", "Locked")));
+                this.newScriptVar(2, "bool", "bLocked")));
 
         this.saveGlobalScript(this.newScript("SetDialogsLocked", true,
                 this.newScriptVar(0, "FName","CharacterID"),
                 this.newScriptVar(1, "TArray<FName>", "LineIDs"),
-                this.newScriptVar(2, "boolean", "Locked")));
+                this.newScriptVar(2, "bool", "bLocked")));
 
         this.saveGlobalScript(this.newScript("SetNextLine", true,
                 this.newScriptVar(0, "FName", "CharacterID"),
